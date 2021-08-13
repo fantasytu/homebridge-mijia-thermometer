@@ -1,9 +1,9 @@
 'use strict';
 
-import { AccessoryConfig, AccessoryPlugin, API, Characteristic, HAP, Logging, Service } from "homebridge";
+import { AccessoryConfig, AccessoryPlugin, API, Characteristic, Logging, Service } from "homebridge";
 import { NobleScanner } from "./noblescanner";
 
-export class MijiaThermometerAccessory {
+export class MijiaThermometerAccessory implements AccessoryPlugin {
   public readonly Service: typeof Service;
   public readonly Characteristic: typeof Characteristic;
 
