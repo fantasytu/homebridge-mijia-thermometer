@@ -46,10 +46,10 @@ export class NobleScanner {
               ' connectable ' + peripheral.connectable + ',' +
               ' RSSI ' + peripheral.rssi + ':');
 
-    var serviceData = peripheral.advertisement.serviceData;
+    const serviceData = peripheral.advertisement.serviceData;
     if (serviceData && serviceData.length) {
       this.log.debug('\tService data:');
-      for (var i in serviceData) {
+      for (const i in serviceData) {
         this.log.debug('\t\t' + JSON.stringify(serviceData[i].uuid) + ': ' + JSON.stringify(serviceData[i].data.toString('hex')));
       }
     }
@@ -62,9 +62,9 @@ export class NobleScanner {
       this.log.debug('\t\t' + peripheral.advertisement.txPowerLevel);
     }
 
-    peripheral.once('connect', this.onConnect.bind(this));
-    peripheral.once('servicesDiscover', this.onServicesDiscover.bind(this));
-    peripheral.once('characteristicsDiscover', this.onCharacteristicsDiscover.bind(this));
+    // peripheral.once('connect', this.onConnect.bind(this));
+    // peripheral.once('servicesDiscover', this.onServicesDiscover.bind(this));
+    // peripheral.once('characteristicsDiscover', this.onCharacteristicsDiscover.bind(this));
   }
 
   onScanStart() {

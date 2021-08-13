@@ -73,11 +73,10 @@ export class MijiaThermometerAccessory implements AccessoryPlugin {
   }
 
   getInformationService() {
-    const packageConf = require('../package.json');
     const accessoryInformation = new this.Service.AccessoryInformation()
       .setCharacteristic(this.Characteristic.Manufacturer, "Xiaomi Mijia")
       .setCharacteristic(this.Characteristic.Model, "LYWSD03MMC")
-      .setCharacteristic(this.Characteristic.FirmwareRevision, packageConf.version)
+      .setCharacteristic(this.Characteristic.FirmwareRevision, '0')
       .setCharacteristic(this.Characteristic.SerialNumber, this.serialNumber);
 
     return accessoryInformation;
