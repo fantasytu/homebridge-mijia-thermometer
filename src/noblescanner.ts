@@ -1,5 +1,5 @@
 import { Logging } from "homebridge";
-import { noble } from "noble";
+import { noble } from "@abandonware/noble";
 
 export class NobleScanner {
   private readonly log: Logging;
