@@ -1,16 +1,15 @@
 {
-  "private": true,
-  "displayName": "Plugin Name",
-  "name": "homebridge-plugin-name",
+  "displayName": "Homebridge Mijia Thermometer",
+  "name": "homebridge-mijia-thermometer",
   "version": "1.0.0",
-  "description": "A short description about what your plugin does.",
+  "description": "Homebridge plugin for the Xiaomi Mi Bluetooth Temperature and Humidity Sensor.",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git://github.com/USERNAME/GITHUB_PROJECT_NAME.git"
+    "url": "git://github.com/fantasytu/homebridge-mijia-thermometer.git"
   },
   "bugs": {
-    "url": "https://github.com/USERNAME/GITHUB_PROJECT_NAME/issues"
+    "url": "https://github.com/fantasytu/homebridge-mijia-thermometer/issues"
   },
   "engines": {
     "node": ">=10.17.0",
@@ -24,9 +23,15 @@
     "prepublishOnly": "npm run lint && npm run build"
   },
   "keywords": [
-    "homebridge-plugin"
+    "homebridge-plugin",
+    "xiaomi",
+    "bluetooth",
+    "humidity-sensor",
+    "temperature-sensor"
   ],
-  "dependencies": {},
+  "dependencies": {
+    "noble": "github:noble/noble"
+  },
   "devDependencies": {
     "@types/node": "^14.14.31",
     "@typescript-eslint/eslint-plugin": "^4.16.1",
