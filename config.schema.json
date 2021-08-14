@@ -1,16 +1,55 @@
 {
-  "pluginAlias": "ExampleHomebridgePlugin",
-  "pluginType": "platform",
-  "singular": true,
+  "pluginAlias": "MijiaThermometer",
+  "pluginType": "accessory",
+  "singular": false,
+  "headerDisplay": null,
   "schema": {
     "type": "object",
     "properties": {
       "name": {
-        "title": "Name",
+        "title": "Accessory Name",
         "type": "string",
-        "required": true,
-        "default": "Example Dynamic Platform"
+        "format": "string",
+        "default": "Temperature & Humidity",
+        "minLength": 1,
+        "required": true
+      },
+      "address": {
+        "title": "Device MAC Address",
+        "type": "string",
+        "format": "string",
+        "placeholder": "e.g. 00:00:00:00:00:00",
+        "description": "Optional. Specify when running multiple devices"
+      },
+      "bindKey": {
+        "title": "Bind Key",
+        "type": "string",
+        "default": "",
+        "description": "Optional. Specify when using sensors with encryption"
       }
     }
-  }
+  },
+  "layout": [
+    {
+      "type": "flex",
+      "flex-flow": "row wrap",
+      "items": [
+        "name"
+      ]
+    },
+    {
+      "type": "flex",
+      "flex-flow": "row wrap",
+      "items": [
+        "address"
+      ]
+    },
+    {
+      "type": "flex",
+      "flex-flow": "row wrap",
+      "items": [
+        "bindKey"
+      ]
+    }
+  ]
 }

@@ -1,0 +1,16 @@
+{
+  "bridge": {
+    "name": "Homebridge",
+    "username": "28:18:9C:A2:A4:78",
+    "port": 73821,
+    "pin": "314-15-926"
+  },
+  "description": "This is an example configuration file.",
+  "accessories": [
+    {
+      "accessory": "MijiaThermometer",
+      "name": "Temperature & Humidity",
+      "address": "85:CB:A8:7F:46:66"
+    }
+  ]
+}
