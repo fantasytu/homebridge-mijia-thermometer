@@ -9,6 +9,9 @@ export const ACCESSORY_NAME = 'MijiaThermometer';
 export const PLUGIN_NAME = 'homebridge-mijia-thermometer';
 
 /**
- * This is the uuid of characteristic that provides thermometer data.
+ * This is the uuids of services and characteristics that provides data.
  */
+export const MI_SERVICE_UUID = 'ebe0ccb07a0a4b0c8a1a6ff2997da3a6';
 export const MI_CHARACTERISTIC_UUID = 'ebe0ccc17a0a4b0c8a1a6ff2997da3a6';
+export const INFO_SERVICE_UUID = '180a';
+export const BAT_SERVICE_UUID = '180f'
