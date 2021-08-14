@@ -17,10 +17,10 @@ export class MijiaThermometerAccessory implements AccessoryPlugin {
   private latestHumidity;
   private latestBatteryLevel;
 
-  private manufacturer = 'Xiaomi Mijia';
-  private modelNumber = '';
-  private serialNumber = '';
-  private firmwareRevision = '';
+  private latestManufacturer;
+  private latestModelNumber;
+  private latestSerialNumber;
+  private latestFirmwareRevision;
 
   private lastUpdatedAt;
 
@@ -56,6 +56,24 @@ export class MijiaThermometerAccessory implements AccessoryPlugin {
     return this.config.humidityName || "Humidity";
   }
 
+  get manufacturer() {
+    return this.latestManufacturer ?? "Xiaomi Mijia";
+  }
+
+  get modelNumber() {
+    return this.latestModelNumber ?? "LYWSD03MMC";
+  }
+
+  get serialNumber() {
+    return this.latestSerialNumber ?? this.config.address.replace(/:/g, "");
+  }
+
+  get firmwareRevision() {
+    const packageConf = require('../package.json');
+    const version = packageConf.version;
+    return this.latestFirmwareRevision ?? version;
+  }
+
   get temperature() {
     if (this.latestTemperature == null) {
       return 0;
@@ -71,10 +89,7 @@ export class MijiaThermometerAccessory implements AccessoryPlugin {
   }
 
   get batteryLevel() {
-    if (this.latestBatteryLevel == null) {
-      return 0;
-    }
-    return this.latestBatteryLevel;
+    return this.latestBatteryLevel ?? 0;
   }
 
   get batteryStatus() {
@@ -159,26 +174,26 @@ export class MijiaThermometerAccessory implements AccessoryPlugin {
 
     const scanner = new NobleScanner(this.log, this.config.address);
 
-    scanner.on("updateModelNumber", (newValue => {
-      this.modelNumber = newValue;
-
-      this.informationService.getCharacteristic(this.Characteristic.Model).updateValue(this.modelNumber);
-      this.log.debug(`Model Number updated: ${newValue}`);
-    }));
-
-    scanner.on("updateSerialNumber", (newValue => {
-      this.serialNumber = newValue;
-
-      this.informationService.getCharacteristic(this.Characteristic.SerialNumber).updateValue(this.serialNumber);
-      this.log.debug(`Serial Number updated: ${newValue}`);
-    }));
-
-    scanner.on("updateFirmwareRevision", (newValue => {
-      this.firmwareRevision = newValue;
-
-      this.informationService.getCharacteristic(this.Characteristic.FirmwareRevision).updateValue(this.firmwareRevision);
-      this.log.debug(`Firmware Revision updated: ${newValue}`);
-    }));
+    // scanner.on("updateModelNumber", (newValue => {
+    //   this.modelNumber = newValue;
+    //
+    //   this.informationService.getCharacteristic(this.Characteristic.Model).updateValue(this.modelNumber);
+    //   this.log.debug(`Model Number updated: ${newValue}`);
+    // }));
+    //
+    // scanner.on("updateSerialNumber", (newValue => {
+    //   this.serialNumber = newValue;
+    //
+    //   this.informationService.getCharacteristic(this.Characteristic.SerialNumber).updateValue(this.serialNumber);
+    //   this.log.debug(`Serial Number updated: ${newValue}`);
+    // }));
+    //
+    // scanner.on("updateFirmwareRevision", (newValue => {
+    //   this.firmwareRevision = newValue;
+    //
+    //   this.informationService.getCharacteristic(this.Characteristic.FirmwareRevision).updateValue(this.firmwareRevision);
+    //   this.log.debug(`Firmware Revision updated: ${newValue}`);
+    // }));
 
     scanner.on("updateBatteryLevel", (newValue => {
       this.latestBatteryLevel = newValue;
@@ -195,7 +210,7 @@ export class MijiaThermometerAccessory implements AccessoryPlugin {
 
       this.temperatureService.getCharacteristic(this.Characteristic.CurrentTemperature).updateValue(this.latestTemperature);
       this.humidityService.getCharacteristic(this.Characteristic.CurrentRelativeHumidity).updateValue(this.latestHumidity);
-      this.log.debug(`Thermometer updated: Temp: ${temp}°C, , Humi: ${hum}%,  bat: ${bat}mV`);
+      this.log.debug(`Thermometer updated: Temp: ${temp}°C, , Humi: ${hum}%,  vbat: ${bat}mV`);
     }));
 
     scanner.on("error", (error) => {

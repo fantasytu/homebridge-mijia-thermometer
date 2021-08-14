@@ -117,29 +117,29 @@ export class NobleScanner extends EventEmitter {
     this.log.debug("Characteristics discovered");
   }
 
-  onReadModelNumberString(data, isNotification) {
-    this.log.debug(`Characteristics Model Number String Found`);
-    this.log.debug(`Characteristics data read: ${data.toString()}`);
-    this.emit("updateModelNumber", data.toString());
-  }
-
-  onReadSerialNumberString(data, isNotification) {
-    this.log.debug(`Characteristics Serial Number String Found`);
-    this.log.debug(`Characteristics data read: ${data.toString()}`);
-    this.emit("updateSerialNumber", data.toString());
-  }
-
-  onReadFirmwareRevisionString(data, isNotification) {
-    this.log.debug(`Characteristic Firmware Revision String Found`);
-    this.log.debug(`Characteristics data read: ${data.toString()}`);
-    this.emit("updateFirmwareRevision", data.toString());
-  }
+  // onReadModelNumberString(data, isNotification) {
+  //   this.log.debug(`Characteristics Model Number String Found`);
+  //   this.log.debug(`Characteristics data read: ${data.toString()}`);
+  //   this.emit("updateModelNumber", data.toString());
+  // }
+  //
+  // onReadSerialNumberString(data, isNotification) {
+  //   this.log.debug(`Characteristics Serial Number String Found`);
+  //   this.log.debug(`Characteristics data read: ${data.toString()}`);
+  //   this.emit("updateSerialNumber", data.toString());
+  // }
+  //
+  // onReadFirmwareRevisionString(data, isNotification) {
+  //   this.log.debug(`Characteristic Firmware Revision String Found`);
+  //   this.log.debug(`Characteristics data read: ${data.toString()}`);
+  //   this.emit("updateFirmwareRevision", data.toString());
+  // }
 
   onReadBatteryLevel(data, isNotification) {
     this.log.debug(`Characteristic Battery Level Found`);
-    this.log.debug(`Characteristics data read: ${data.readUInt16LE(0)}`);
+    this.log.debug(`Characteristics data read: ${data.readUInt8()}`);
 
-    this.emit("updateBatteryLevel", data.readUInt16LE(0));
+    this.emit("updateBatteryLevel", data.readUInt8());
   }
 
   onReadThermometer(data, isNotification) {
@@ -147,8 +147,9 @@ export class NobleScanner extends EventEmitter {
     this.log.debug(`Characteristics data read: ${data.toString('hex')}`);
     const temp = data.readUInt16LE(0) / 100;
     const hum = data.readUInt8(2);
+    const bat = data.readUInt16LE(3);
 
-    this.emit("updateThermometer", {temp, hum});
+    this.emit("updateThermometer", {temp, hum, bat});
   }
 
   onNotify(state) {
