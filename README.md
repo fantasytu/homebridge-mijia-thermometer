@@ -1,150 +1,75 @@
+# Homebridge Mijia Thermometer Plugin
 
-<p align="center">
+This is a [Homebridge](https://github.com/nfarina/homebridge) plugin to provide for Xiaomi Mijia Thermometer(specifically LYWSD03MMC).
 
-<img src="https://github.com/homebridge/branding/raw/master/logos/homebridge-wordmark-logo-vertical.png" width="150">
+**If you like this plugin, don't hesitate to "Star".**
 
-</p>
-
-
-# Homebridge Platform Plugin Template
-
-This is a template Homebridge platform plugin and can be used as a base to help you get started developing your own plugin.
-
-This template should be used in conjunction with the [developer documentation](https://developers.homebridge.io/). A full list of all supported service types, and their characteristics is available on this site.
-
-## Clone As Template
-
-Click the link below to create a new GitHub Repository using this template, or click the *Use This Template* button above.
-
-<span align="center">
-
-### [Create New Repository From Template](https://github.com/homebridge/homebridge-plugin-template/generate)
-
-</span>
-
-## Setup Development Environment
-
-To develop Homebridge plugins you must have Node.js 12 or later installed, and a modern code editor such as [VS Code](https://code.visualstudio.com/). This plugin template uses [TypeScript](https://www.typescriptlang.org/) to make development easier and comes with pre-configured settings for [VS Code](https://code.visualstudio.com/) and ESLint. If you are using VS Code install these extensions:
-
-* [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
-
-## Install Development Dependencies
-
-Using a terminal, navigate to the project folder and run this command to install the development dependencies:
+## Installation
 
 ```
-npm install
+sudo npm i -g homebridge-mijia-thermometer@latest
 ```
 
-## Update package.json
+These libraries and their dependencies are required by the [Noble](https://www.npmjs.com/package/noble) library and provide access to the kernel Bluetooth subsystem:
 
-Open the [`package.json`](./package.json) and change the following attributes:
+#### Ubuntu/Debian/Raspbian
 
-* `name` - this should be prefixed with `homebridge-` or `@username/homebridge-` and contain no spaces or special characters apart from a dashes
-* `displayName` - this is the "nice" name displayed in the Homebridge UI
-* `repository.url` - Link to your GitHub repo
-* `bugs.url` - Link to your GitHub repo issues page
-
-When you are ready to publish the plugin you should set `private` to false, or remove the attribute entirely.
-
-## Update Plugin Defaults
-
-Open the [`src/settings.ts`](./src/settings.ts) file and change the default values:
-
-* `PLATFORM_NAME` - Set this to be the name of your platform. This is the name of the platform that users will use to register the plugin in the Homebridge `config.json`.
-* `PLUGIN_NAME` - Set this to be the same name you set in the [`package.json`](./package.json) file. 
-
-Open the [`config.schema.json`](./config.schema.json) file and change the following attribute:
-
-* `pluginAlias` - set this to match the `PLATFORM_NAME` you defined in the previous step.
-
-## Build Plugin
-
-TypeScript needs to be compiled into JavaScript before it can run. The following command will compile the contents of your [`src`](./src) directory and put the resulting code into the `dist` folder.
-
-```
-npm run build
+```sh
+sudo apt-get install bluetooth bluez libbluetooth-dev libudev-dev
 ```
 
-## Link To Homebridge
+#### Fedora/CentOS/Other-RPM based
 
-Run this command so your global install of Homebridge can discover the plugin in your development environment:
-
-```
-npm link
-```
-
-You can now start Homebridge, use the `-D` flag so you can see debug log messages in your plugin:
-
-```
-homebridge -D
+```sh
+sudo yum install bluez bluez-libs bluez-libs-devel
+sudo yum install systemd-devel
+sudo yum provides */libudev.h
 ```
 
-## Watch For Changes and Build Automatically
+For more detailed information and descriptions for other platforms please see the [Noble documentation](https://github.com/noble/noble#readme).
 
-If you want to have your code compile automatically as you make changes, and restart Homebridge automatically between changes you can run:
+## Configuration
 
-```
-npm run watch
-```
+Configuration on [Homebridge Config UI X](https://github.com/oznu/homebridge-config-ui-x) is supported.
 
-This will launch an instance of Homebridge in debug mode which will restart every time you make a change to the source code. It will load the config stored in the default location under `~/.homebridge`. You may need to stop other running instances of Homebridge while using this command to prevent conflicts. You can adjust the Homebridge startup command in the [`nodemon.json`](./nodemon.json) file.
+Alternatively, you could update your Homebridge `config.json` file according to these parameters.
 
-## Customise Plugin
 
-You can now start customising the plugin template to suit your requirements.
+| Key                     | Default             |                                                                                             |
+|-------------------------|---------------------|---------------------------------------------------------------------------------------------|
+| `accessory`             | `MijiaThermometer`  | Required. The name of this plugin.                                                          |
+| `name`                  | `Thermometer`       | Required. The name of this accessory. This will appear in your Home app.                    |
+| `address`               | `a0:c1:0c:d4:e1:6b` | Required. The address of the device.                                                        |
+| `humidityName`          | `"Humidity"`        | Optional. Name of the humidity sensor as it will appear in your Home app.                   |
+| `temperatureName`       | `"Temperature"`     | Name of the temperature sensor as it will appear in your Home app.                          |
+| `lowBattery`            | `10`                | At what battery percentage Homekit should start warning about low battery.                  |
+| `temperatureOffset`     | `0`                 | An offset to apply to temperature values for calibration if measured values are incorrect.  |
+| `humidityOffset`        | `0`                 | An offset to apply to humidity values for calibration if measured values are incorrect.     |
+| `bindKey`               |                     | A key which is used to for firmware.                                                        |
 
-* [`src/platform.ts`](./src/platform.ts) - this is where your device setup and discovery should go.
-* [`src/platformAccessory.ts`](./src/platformAccessory.ts) - this is where your accessory control logic should go, you can rename or create multiple instances of this file for each accessory type you need to implement as part of your platform plugin. You can refer to the [developer documentation](https://developers.homebridge.io/) to see what characteristics you need to implement for each service type.
-* [`config.schema.json`](./config.schema.json) - update the config schema to match the config you expect from the user. See the [Plugin Config Schema Documentation](https://developers.homebridge.io/#/config-schema).
 
-## Versioning Your Plugin
+## Tested On
 
-Given a version number `MAJOR`.`MINOR`.`PATCH`, such as `1.4.3`, increment the:
+* iOS 15
+* Apple Home
+* Homebridge 1.3.4 ( running on Centos 8 with Bluetooth Chip RTL8761B )
 
-1. **MAJOR** version when you make breaking changes to your plugin,
-2. **MINOR** version when you add functionality in a backwards compatible manner, and
-3. **PATCH** version when you make backwards compatible bug fixes.
+## Other issues
 
-You can use the `npm version` command to help you with this:
+### Running without root/sudo (Linux-specific)
 
-```bash
-# major update / breaking changes
-npm version major
+Run the following command:
 
-# minor update / new features
-npm version update
-
-# patch / bugfixes
-npm version patch
-```
-
-## Publish Package
-
-When you are ready to publish your plugin to [npm](https://www.npmjs.com/), make sure you have removed the `private` attribute from the [`package.json`](./package.json) file then run:
-
-```
-npm publish
+```sh
+sudo setcap cap_net_raw+eip $(eval readlink -f `which node`)
 ```
 
-If you are publishing a scoped plugin, i.e. `@username/homebridge-xxx` you will need to add `--access=public` to command the first time you publish.
+This grants the [node](https://github.com/abandonware/noble) binary `cap_net_raw` privileges, so it can start/stop BLE advertising.
 
-#### Publishing Beta Versions
+### Using Bluetooth 5.0 USB Dongle with RTL8761B chipset on Linux kernel 5.10
 
-You can publish *beta* versions of your plugin for other users to test before you release it to everyone.
+Tutorial is listed in this [git](https://github.com/linuxonly1993/rtl8761b_bt_5_linux).
 
-```bash
-# create a new pre-release version (eg. 2.1.0-beta.1)
-npm version prepatch --preid beta
+## Troubleshooting
 
-# publsh to @beta
-npm publish --tag=beta
-```
-
-Users can then install the  *beta* version by appending `@beta` to the install command, for example:
-
-```
-sudo npm install -g homebridge-example-plugin@beta
-```
-
-
+If you have any issue, contact me(**f.tu@me.com**) or just submit an [issues](https://github.com/fantasytu/homebridge-mijia-thermometer/issues).

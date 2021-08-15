@@ -19,13 +19,44 @@
         "type": "string",
         "format": "string",
         "placeholder": "e.g. 00:00:00:00:00:00",
-        "description": "Optional. Specify when running multiple devices"
+        "description": "Required. MAC Address of the device.",
+        "required": true
+      },
+      "temperatureName": {
+        "title": "Custom Name - Temperature",
+        "type": "string",
+        "format": "string",
+        "default": "Temperature"
+      },
+      "humidityName": {
+        "title": "Custom Name - Humidity",
+        "type": "string",
+        "format": "string",
+        "default": "Humidity"
+      },
+      "lowBattery": {
+        "title": "Low Battery Threshold",
+        "type": "integer",
+        "default": 10,
+        "description": "At what battery percentage Homekit should start warning about low battery."
+      },
+      "temperatureOffset": {
+        "title": "Offset - Temperature",
+        "type": "integer",
+        "default": 0,
+        "description": "An offset to apply to temperature values for calibration if measured values are incorrect."
+      },
+      "humidityOffset": {
+        "title": "Offset - Humidity",
+        "type": "integer",
+        "default": 0,
+        "description": "An offset to apply to humidity values for calibration if measured values are incorrect."
       },
       "bindKey": {
         "title": "Bind Key",
         "type": "string",
         "default": "",
-        "description": "Optional. Specify when using sensors with encryption"
+        "description": "Optional. For firmware and adavanced stuff."
       }
     }
   },
@@ -48,6 +79,18 @@
       "type": "flex",
       "flex-flow": "row wrap",
       "items": [
+        "temperatureName",
+        "humidityName"
+      ]
+    },
+    {
+      "type": "fieldset",
+      "title": "Advanced configuration",
+      "expandable": true,
+      "items": [
+        "lowBattery",
+        "temperatureOffset",
+        "humidityOffset",
         "bindKey"
       ]
     }

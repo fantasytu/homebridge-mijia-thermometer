@@ -52,9 +52,9 @@ export class NobleScanner extends EventEmitter {
       try {
         await noble.stopScanningAsync();
 
-        this.log.debug(`${peripheral.address} (${peripheral.advertisement.localName}) Connecting`);
+        this.log.info(`${peripheral.address} (${peripheral.advertisement.localName}) Connecting`);
         await peripheral.connectAsync();
-        this.log.debug(`${peripheral.address} (${peripheral.advertisement.localName}) Connected`);
+        this.log.info(`${peripheral.address} (${peripheral.advertisement.localName}) Connected`);
 
         const services = await peripheral.discoverServicesAsync([INFO_SERVICE_UUID, BAT_SERVICE_UUID, MI_SERVICE_UUID]);
         for (const service of services) {
@@ -85,15 +85,15 @@ export class NobleScanner extends EventEmitter {
   }
 
   onScanStart() {
-    this.log.debug("Started scanning.");
+    this.log.info("Started scanning.");
   }
 
   onScanStop() {
-    this.log.debug("Stopped scanning.");
+    this.log.info("Stopped scanning.");
   }
 
   onWarning(message) {
-    this.log.info("Warning: ", message);
+    this.log.warn("Warning: ", message);
   }
 
   onStateChange(state) {
@@ -103,18 +103,6 @@ export class NobleScanner extends EventEmitter {
       this.log.info(`Stop scanning. (${state})`);
       this.stop();
     }
-  }
-
-  onConnect(error) {
-    this.log.debug("Device connected");
-  }
-
-  onServicesDiscover(services) {
-    this.log.debug("Service discovered");
-  }
-
-  onCharacteristicsDiscover(characteristics) {
-    this.log.debug("Characteristics discovered");
   }
 
   // onReadModelNumberString(data, isNotification) {
