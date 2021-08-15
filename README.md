@@ -1,5 +1,11 @@
 # Homebridge Mijia Thermometer Plugin
 
+[![npm](https://img.shields.io/npm/v/homebridge-mijia-thermometer.svg)](https://www.npmjs.com/package/homebridge-mijia-thermometer)
+[![github](https://img.shields.io/github/package-json/v/fantasytu/homebridge-mijia-thermometer.svg)](http://github.com/fantasytu/homebridge-mijia-thermometer)
+[![license](https://img.shields.io/github/license/fantasytu/homebridge-mijia-thermometer.svg)](http://github.com/fantasytu/homebridge-mijia-thermometer)
+[![donate](https://img.shields.io/badge/Donate-Paypal-blue.svg)](https://paypal.me/fantasytu)
+[![donate-alipay](https://img.shields.io/badge/捐赠-支付宝-blue.svg)](https://qr.alipay.com/fkx16957oe24tjvvxtdmfa4)
+
 This is a [Homebridge](https://github.com/nfarina/homebridge) plugin to provide for Xiaomi Mijia Thermometer(specifically LYWSD03MMC).
 
 **If you like this plugin, don't hesitate to "Star".**
