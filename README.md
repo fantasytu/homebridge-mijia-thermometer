@@ -53,6 +53,15 @@ Alternatively, you could update your Homebridge `config.json` file according to 
 | `humidityOffset`        | `0`                 | An offset to apply to humidity values for calibration if measured values are incorrect.     |
 | `bindKey`               |                     | A key which is used to for firmware.                                                        |
 
+#### Automatically Retrieved Model, Serial Number and Firmware Revision
+
+Version 1.6 supports to retrieve model, serial number and firmware revision via BLE advertisement.
+
+Since information service is initialized before the Bluetooth scanner, so the information retrieved is cached into a file (stored at '~/.homebridge/.MijiaThermometer/') that will be loaded at the **SECOND** boot. So in order to make sure this function works well, it is highly suggested to reboot Homebridge after your device is connected and **four** of these following messages have been displayed in console.
+
+```
+Device Info cached!
+```
 
 ## Tested On
 

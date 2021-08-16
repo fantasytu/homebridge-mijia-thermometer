@@ -105,23 +105,35 @@ export class NobleScanner extends EventEmitter {
     }
   }
 
-  // onReadModelNumberString(data, isNotification) {
-  //   this.log.debug(`Characteristics Model Number String Found`);
-  //   this.log.debug(`Characteristics data read: ${data.toString()}`);
-  //   this.emit("updateModelNumber", data.toString());
-  // }
-  //
-  // onReadSerialNumberString(data, isNotification) {
-  //   this.log.debug(`Characteristics Serial Number String Found`);
-  //   this.log.debug(`Characteristics data read: ${data.toString()}`);
-  //   this.emit("updateSerialNumber", data.toString());
-  // }
-  //
-  // onReadFirmwareRevisionString(data, isNotification) {
-  //   this.log.debug(`Characteristic Firmware Revision String Found`);
-  //   this.log.debug(`Characteristics data read: ${data.toString()}`);
-  //   this.emit("updateFirmwareRevision", data.toString());
-  // }
+  onReadModelNumberString(data, isNotification) {
+    this.log.debug(`Characteristics Model Number String Found`);
+    this.log.debug(`Characteristics data read: ${data.toString()}`);
+    this.emit("updateModelNumber", data.toString());
+  }
+
+  onReadSerialNumberString(data, isNotification) {
+    this.log.debug(`Characteristics Serial Number String Found`);
+    this.log.debug(`Characteristics data read: ${data.toString()}`);
+    this.emit("updateSerialNumber", data.toString());
+  }
+
+  onReadFirmwareRevisionString(data, isNotification) {
+    this.log.debug(`Characteristic Firmware Revision String Found`);
+    this.log.debug(`Characteristics data read: ${data.toString()}`);
+    this.emit("updateFirmwareRevision", data.toString());
+  }
+
+  onReadHardwareRevisionString(data, isNotification) {
+    this.log.debug(`Characteristic Hardware Revision String Found`);
+    this.log.debug(`Characteristics data read: ${data.toString()}`);
+    this.emit("updateHardwareRevision", data.toString());
+  }
+
+  onReadSoftwareRevisionString(data, isNotification) {
+    this.log.debug(`Characteristic Software Revision String Found`);
+    this.log.debug(`Characteristics data read: ${data.toString()}`);
+    this.emit("updateSoftwareRevision", data.toString());
+  }
 
   onReadBatteryLevel(data, isNotification) {
     this.log.debug(`Characteristic Battery Level Found`);

@@ -2,6 +2,9 @@
 
 import { AccessoryConfig, AccessoryPlugin, API, Characteristic, Logging, Service } from "homebridge";
 import { NobleScanner } from "./noblescanner";
+import fs from 'fs';
+import mkdirp from 'mkdirp';
+import { CACHE_DIRECTORY } from './settings';
 
 export class MijiaThermometerAccessory implements AccessoryPlugin {
   public readonly Service: typeof Service;
@@ -11,16 +14,14 @@ export class MijiaThermometerAccessory implements AccessoryPlugin {
   private readonly config: AccessoryConfig;
   private readonly api: API;
 
+  private cachedInfo;
+  private deviceFile;
+
   private nobleScanner;
 
   private latestTemperature;
   private latestHumidity;
   private latestBatteryLevel;
-
-  private latestManufacturer;
-  private latestModelNumber;
-  private latestSerialNumber;
-  private latestFirmwareRevision;
 
   private lastUpdatedAt;
 
@@ -37,6 +38,8 @@ export class MijiaThermometerAccessory implements AccessoryPlugin {
     // get service & characteristic
     this.Service = api.hap.Service;
     this.Characteristic = api.hap.Characteristic;
+
+    this.loadCachedInfo();
 
     this.informationService = this.getInformationService();
     this.temperatureService = this.getTemperatureService();
@@ -56,36 +59,18 @@ export class MijiaThermometerAccessory implements AccessoryPlugin {
     return this.config.humidityName || "Humidity";
   }
 
-  get manufacturer() {
-    return this.latestManufacturer ?? "Xiaomi Mijia";
-  }
-
-  get modelNumber() {
-    return this.latestModelNumber ?? "LYWSD03MMC";
-  }
-
-  get serialNumber() {
-    return this.latestSerialNumber ?? this.config.address.replace(/:/g, "");
-  }
-
-  get firmwareRevision() {
-    const packageConf = require('../package.json');
-    const version = packageConf.version;
-    return this.latestFirmwareRevision ?? version;
-  }
-
   get temperature() {
     if (this.latestTemperature == null) {
       return 0;
     }
-    return this.latestTemperature + this.config.temperatureOffset;
+    return this.latestTemperature + (this.config.temperatureOffset ?? 0);
   }
 
   get humidity() {
     if (this.latestHumidity == null) {
       return 0;
     }
-    return this.latestHumidity + this.config.humidityOffset;
+    return this.latestHumidity + (this.config.humidityOffset ?? 0);
   }
 
   get batteryLevel() {
@@ -118,19 +103,17 @@ export class MijiaThermometerAccessory implements AccessoryPlugin {
   }
 
   getInformationService() {
+    const packageConf = require('../package.json');
+    const version = packageConf.version;
     const accessoryInformation = new this.Service.AccessoryInformation();
     accessoryInformation
-      .getCharacteristic(this.Characteristic.Manufacturer)
-      .on("get", this.onCharacteristicGetValue.bind(this, "manufacturer"));
-    accessoryInformation
-      .getCharacteristic(this.Characteristic.Model)
-      .on("get", this.onCharacteristicGetValue.bind(this, "modelNumber"));
-    accessoryInformation
-      .getCharacteristic(this.Characteristic.SerialNumber)
-      .on("get", this.onCharacteristicGetValue.bind(this, "serialNumber"));
-    accessoryInformation
-      .getCharacteristic(this.Characteristic.FirmwareRevision)
-      .on("get", this.onCharacteristicGetValue.bind(this, "firmwareRevision"));
+      .setCharacteristic(this.Characteristic.Name, this.config.name)
+      .setCharacteristic(this.Characteristic.Manufacturer, "Xiaomi Mijia")
+      .setCharacteristic(this.Characteristic.Model, this.cachedInfo.model ?? "LYWSD03MMC")
+      .setCharacteristic(this.Characteristic.SerialNumber, this.cachedInfo.serialNumber ?? this.config.address.replace(/:/g, ""))
+      .setCharacteristic(this.Characteristic.FirmwareRevision, this.cachedInfo.softwareRevision ?? version)
+      .setCharacteristic(this.Characteristic.HardwareRevision, this.cachedInfo.hardwareRevision ?? 0)
+      .setCharacteristic(this.Characteristic.SoftwareRevision, this.cachedInfo.softwareRevision ?? 0);
 
     return accessoryInformation;
   }
@@ -174,26 +157,35 @@ export class MijiaThermometerAccessory implements AccessoryPlugin {
 
     const scanner = new NobleScanner(this.log, this.config.address);
 
-    // scanner.on("updateModelNumber", (newValue => {
-    //   this.modelNumber = newValue;
-    //
-    //   this.informationService.getCharacteristic(this.Characteristic.Model).updateValue(this.modelNumber);
-    //   this.log.debug(`Model Number updated: ${newValue}`);
-    // }));
-    //
-    // scanner.on("updateSerialNumber", (newValue => {
-    //   this.serialNumber = newValue;
-    //
-    //   this.informationService.getCharacteristic(this.Characteristic.SerialNumber).updateValue(this.serialNumber);
-    //   this.log.debug(`Serial Number updated: ${newValue}`);
-    // }));
-    //
-    // scanner.on("updateFirmwareRevision", (newValue => {
-    //   this.firmwareRevision = newValue;
-    //
-    //   this.informationService.getCharacteristic(this.Characteristic.FirmwareRevision).updateValue(this.firmwareRevision);
-    //   this.log.debug(`Firmware Revision updated: ${newValue}`);
-    // }));
+    scanner.on("updateModelNumber", (newValue => {
+      this.cachedInfo.modelNumber = newValue.replace(/\0/g, '');
+      this.log.debug(`Model Number updated: ${newValue}`);
+      this.saveCachedInfo();
+    }));
+
+    scanner.on("updateSerialNumber", (newValue => {
+      this.cachedInfo.serialNumber = newValue.replace(/\0/g, '').replace(/--/g, '');
+      this.log.debug(`Serial Number updated: ${newValue}`);
+      this.saveCachedInfo();
+    }));
+
+    scanner.on("updateFirmwareRevision", (newValue => {
+      this.cachedInfo.firmwareRevision = newValue.replace(/\0/g, '');
+      this.log.debug(`Firmware Revision updated: ${newValue}`);
+      this.saveCachedInfo();
+    }));
+
+    scanner.on("updateHardwareRevision", (newValue => {
+      this.cachedInfo.hardwareRevision = newValue.replace(/\0/g, '');
+      this.log.debug(`Hardware Revision updated: ${newValue}`);
+      this.saveCachedInfo();
+    }));
+
+    scanner.on("updateSoftwareRevision", (newValue => {
+      this.cachedInfo.softwareRevision = newValue.replace(/\0/g, '');
+      this.log.debug(`Software Revision updated: ${newValue}`);
+      this.saveCachedInfo();
+    }));
 
     scanner.on("updateBatteryLevel", (newValue => {
       this.latestBatteryLevel = newValue;
@@ -227,5 +219,35 @@ export class MijiaThermometerAccessory implements AccessoryPlugin {
     } else {
       callback(null, value);
     }
+  }
+
+  loadCachedInfo() {
+    // check if the CACHE_DIRECTORY exists, if not then create it
+    if (fs.existsSync(CACHE_DIRECTORY) === false) {
+      mkdirp(CACHE_DIRECTORY);
+    }
+
+    this.deviceFile = CACHE_DIRECTORY + 'deviceInfo_' + this.config.address.replace(/:/g, "");
+
+    try {
+      this.cachedInfo = JSON.parse(fs.readFileSync(this.deviceFile).toString());
+      this.log.info(`Cached info file found for device(${this.config.address})`);
+      this.log.debug(`Cache info for device:\n ${JSON.stringify(this.cachedInfo, null, 2)} `);
+      this.log.info(`Loading cached info to Information Service.`);
+    } catch (err) {
+      this.log.debug('Cached info file for this device do not exist.');
+      this.cachedInfo = {};
+    }
+  }
+
+  saveCachedInfo() {
+    // save model name and deviceId
+    fs.writeFile(this.deviceFile, JSON.stringify(this.cachedInfo), (err) => {
+      if (err) {
+        this.log.warn('[Writing cache info to file]Warning: %s', err);
+      } else {
+        this.log.info('Device Info cached!');
+      }
+    });
   }
 }
