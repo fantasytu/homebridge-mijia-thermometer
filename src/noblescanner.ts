@@ -112,7 +112,7 @@ export class NobleScanner extends EventEmitter {
           }
       }
 
-      this.log.info(`${peripheral.address} (${peripheral.advertisement.localName}) Init data synced. Ready disconnect and enter LE mode.`);
+      this.log.info(`${peripheral.address} (${peripheral.advertisement.localName}) Init data synced. Ready to disconnect and enter LE mode.`);
 
       setTimeout(() => {
         this.firstConnect = false;
@@ -129,7 +129,7 @@ export class NobleScanner extends EventEmitter {
     try {
       const serviceData = peripheral.advertisement.serviceData.find(data => data.uuid.toLowerCase() === ADVERTISEMENT_SERVICE_UUID).data;
 
-      this.log.debug(`${peripheral.address} (${peripheral.advertisement.localName}) serviceData: ${serviceData}`);
+      this.log.debug(`${peripheral.address} (${peripheral.advertisement.localName}) serviceData: ${serviceData.toString("hex")}`);
 
       const result = new Parser(serviceData, this.bindKey).parse();
 
