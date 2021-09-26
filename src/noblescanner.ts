@@ -1,19 +1,24 @@
 import { Logging } from "homebridge";
 import noble from "@abandonware/noble";
 import { EventEmitter } from "events";
-import { INFO_SERVICE_UUID, BAT_SERVICE_UUID, MI_SERVICE_UUID, MI_CHARACTERISTIC_UUID } from './settings';
+import { Parser } from './parser';
+import { INFO_SERVICE_UUID, MI_SERVICE_UUID, MI_CHARACTERISTIC_UUID, ADVERTISEMENT_SERVICE_UUID, EVENT_TYPES } from './settings';
 
 export class NobleScanner extends EventEmitter {
   private readonly log: Logging;
-  private scanning = false;
 
   private address: string;
+  private bindKey: string;
 
-  constructor(log: Logging, address: string) {
+  private disconnectDelay = 3;
+  private firstConnect = true;
+
+  constructor(log: Logging, address: string, bindKey: string) {
     super();
 
     this.log = log;
     this.address = address;
+    this.bindKey = bindKey;
 
     this.registerEvents();
   }
@@ -30,57 +35,26 @@ export class NobleScanner extends EventEmitter {
     this.log.debug("Start scanning.");
     try {
       noble.startScanning([], true);
-      this.scanning = true;
-    } catch (e) {
-      this.scanning = false;
-      this.log.error(e);
+    } catch (error) {
+      this.emit("error", error);
     }
   }
 
   stop() {
-    this.scanning = false;
     noble.stopScanning();
   }
 
   async onDiscover(peripheral) {
     this.log.debug('Peripheral discovered (' + peripheral.id +
-              ' with address <' + peripheral.address +  ', ' + peripheral.addressType + '>,' +
+              ' with address <' + peripheral.address + '>,' +
               ' connectable ' + peripheral.connectable + ',' +
               ' RSSI ' + peripheral.rssi + ')');
 
     if (peripheral.address === this.address.toLowerCase() ) {
-      try {
-        await noble.stopScanningAsync();
-
-        this.log.info(`${peripheral.address} (${peripheral.advertisement.localName}) Connecting`);
-        await peripheral.connectAsync();
-        this.log.info(`${peripheral.address} (${peripheral.advertisement.localName}) Connected`);
-
-        const services = await peripheral.discoverServicesAsync([INFO_SERVICE_UUID, BAT_SERVICE_UUID, MI_SERVICE_UUID]);
-        for (const service of services) {
-
-            const characteristics = await service.discoverCharacteristicsAsync([]);
-            for (const characteristic of characteristics) {
-                if (characteristic.name === null && characteristic.uuid === MI_CHARACTERISTIC_UUID) {
-                    characteristic.on('data', this.onReadThermometer.bind(this));
-                    characteristic.readAsync();
-                }
-
-                if (characteristic.name != null){
-                  const cleanCharacteristicName = characteristic.name.replace(/\s+/g,"");
-                  const onReadCharacteristic = `onRead${cleanCharacteristicName}`;
-                  if (this[onReadCharacteristic] != null && characteristic.properties.includes("read")) {
-                      characteristic.on('data', this[onReadCharacteristic].bind(this));
-                      characteristic.readAsync();
-                  }
-                }
-
-            }
-        }
-
-      } catch (error) {
-        this.log.error(`Warning: ${error}`);
+      if (this.firstConnect) {
+        await this.onFirstConnect(peripheral);
       }
+      await this.onParseAdvertisement(peripheral);
     }
   }
 
@@ -103,6 +77,123 @@ export class NobleScanner extends EventEmitter {
       this.log.info(`Stop scanning. (${state})`);
       this.stop();
     }
+  }
+
+  async onFirstConnect(peripheral) {
+    try {
+      await noble.stopScanningAsync();
+
+      this.log.info(`${peripheral.address} (${peripheral.advertisement.localName}) Connecting`);
+      await peripheral.connectAsync();
+      this.log.info(`${peripheral.address} (${peripheral.advertisement.localName}) Connected`);
+
+      peripheral.once('disconnect', this.onDisconnect.bind(this));
+
+      const services = await peripheral.discoverServicesAsync([INFO_SERVICE_UUID, MI_SERVICE_UUID]);
+      for (const service of services) {
+
+          const characteristics = await service.discoverCharacteristicsAsync([]);
+          for (const characteristic of characteristics) {
+              if (characteristic.name === null && characteristic.uuid === MI_CHARACTERISTIC_UUID) {
+                  characteristic.on('data', this.onReadThermometer.bind(this));
+                  await characteristic.readAsync();
+              }
+
+              if (characteristic.name != null){
+                const cleanCharacteristicName = characteristic.name.replace(/\s+/g,"");
+                const onReadCharacteristic = `onRead${cleanCharacteristicName}`;
+                if (this[onReadCharacteristic] != null && characteristic.properties.includes("read")) {
+                    characteristic.on('data', this[onReadCharacteristic].bind(this));
+                    this.log.debug(`${peripheral.address} Characteristic: ${onReadCharacteristic}`);
+                    await characteristic.readAsync();
+                }
+              }
+
+          }
+      }
+
+      this.log.info(`${peripheral.address} (${peripheral.advertisement.localName}) Init data synced. Ready disconnect and enter LE mode.`);
+
+      setTimeout(() => {
+        this.firstConnect = false;
+        peripheral.disconnect();
+        this.start();
+      }, this.disconnectDelay * 1000);
+
+    } catch (error) {
+      this.emit("error", error);
+    }
+  }
+
+  async onParseAdvertisement(peripheral) {
+    try {
+      const serviceData = peripheral.advertisement.serviceData.find(data => data.uuid.toLowerCase() === ADVERTISEMENT_SERVICE_UUID).data;
+
+      this.log.debug(`${peripheral.address} (${peripheral.advertisement.localName}) serviceData: ${serviceData}`);
+
+      const result = new Parser(serviceData, this.bindKey).parse();
+
+      if (result == null) {
+        return;
+      }
+
+      if (!result.frameControl.hasEvent) {
+        this.log.debug("No event");
+        return;
+      }
+
+      this.log.debug(`${result.eventType}`);
+
+      switch (result.eventType) {
+        case EVENT_TYPES.temperature: {
+          const temperature = result.event.temperature;
+          this.emit("updateTemperature", temperature);
+          break;
+        }
+        case EVENT_TYPES.humidity: {
+          const humidity = result.event.humidity;
+          this.emit("updateHumidity", humidity);
+          break;
+        }
+        case EVENT_TYPES.battery: {
+          const battery = result.event.battery;
+          this.emit("updateBatteryLevel", battery);
+          break;
+        }
+        case EVENT_TYPES.temperatureAndHumidity: {
+          const temperature = result.event.temperature;
+          const humidity = result.event.humidity;
+          this.emit("updateTemperature", temperature);
+          this.emit("updateHumidity", humidity);
+          break;
+        }
+        case EVENT_TYPES.illuminance: {
+          const illuminance = result.event.illuminance;
+          this.emit("updateIlluminance", illuminance);
+          break;
+        }
+        case EVENT_TYPES.moisture: {
+          const moisture = result.event.moisture;
+          this.emit("updateMoisture", moisture);
+          break;
+        }
+        case EVENT_TYPES.fertility: {
+          const fertility = result.event.fertility;
+          this.emit("updateFertility", fertility);
+          break;
+        }
+        default: {
+          this.emit("error", new Error(`Unknown event type ${result.eventType}`));
+          return;
+        }
+      }
+    } catch (error) {
+      this.emit("error", error);
+    }
+  }
+
+  onDisconnect() {
+    this.log.debug(`Disconnected.`);
   }
 
   onReadModelNumberString(data, isNotification) {
@@ -133,13 +224,6 @@ export class NobleScanner extends EventEmitter {
     this.log.debug(`Characteristic Software Revision String Found`);
     this.log.debug(`Characteristics data read: ${data.toString()}`);
     this.emit("updateSoftwareRevision", data.toString());
-  }
-
-  onReadBatteryLevel(data, isNotification) {
-    this.log.debug(`Characteristic Battery Level Found`);
-    this.log.debug(`Characteristics data read: ${data.readUInt8()}`);
-
-    this.emit("updateBatteryLevel", data.readUInt8());
   }
 
   onReadThermometer(data, isNotification) {

@@ -74,7 +74,7 @@ export class MijiaThermometerAccessory implements AccessoryPlugin {
   }
 
   get batteryLevel() {
-    return this.latestBatteryLevel ?? 0;
+    return this.latestBatteryLevel ?? 100;
   }
 
   get batteryStatus() {
@@ -155,7 +155,7 @@ export class MijiaThermometerAccessory implements AccessoryPlugin {
       return;
     }
 
-    const scanner = new NobleScanner(this.log, this.config.address);
+    const scanner = new NobleScanner(this.log, this.config.address, this.config.bindKey);
 
     scanner.on("updateModelNumber", (newValue => {
       this.cachedInfo.modelNumber = newValue.replace(/\0/g, '');
@@ -194,6 +194,22 @@ export class MijiaThermometerAccessory implements AccessoryPlugin {
       this.log.debug(`Battery Level updated: ${newValue}`);
     }));
 
+    scanner.on("updateTemperature", (newValue => {
+      this.latestTemperature = newValue;
+      this.lastUpdatedAt = Date.now();
+
+      this.temperatureService.getCharacteristic(this.Characteristic.CurrentTemperature).updateValue(this.latestTemperature);
+      this.log.debug(`Temperature updated: Temp: ${newValue}°C`);
+    }));
+
+    scanner.on("updateHumidity", (newValue => {
+      this.latestTemperature = newValue;
+      this.lastUpdatedAt = Date.now();
+
+      this.humidityService.getCharacteristic(this.Characteristic.CurrentRelativeHumidity).updateValue(this.latestHumidity);
+      this.log.debug(`Humidity updated: Humi: ${newValue}}%`);
+    }));
+
     scanner.on("updateThermometer", (newValue => {
       const {temp, hum, bat} = newValue;
       this.latestTemperature = temp;
@@ -202,11 +218,11 @@ export class MijiaThermometerAccessory implements AccessoryPlugin {
 
       this.temperatureService.getCharacteristic(this.Characteristic.CurrentTemperature).updateValue(this.latestTemperature);
       this.humidityService.getCharacteristic(this.Characteristic.CurrentRelativeHumidity).updateValue(this.latestHumidity);
-      this.log.debug(`Thermometer updated: Temp: ${temp}°C, , Humi: ${hum}%,  vbat: ${bat}mV`);
+      this.log.debug(`Thermometer updated: Temp: ${temp}°C, Humi: ${hum}%,  vbat: ${bat}mV`);
     }));
 
     scanner.on("error", (error) => {
-      this.log.error(error);
+      this.log.error(`Error: ${error}`);
     });
 
     return scanner;
