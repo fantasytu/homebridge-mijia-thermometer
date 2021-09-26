@@ -1,7 +1,7 @@
 {
   "displayName": "Homebridge Mijia Thermometer",
   "name": "homebridge-mijia-thermometer",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "description": "Homebridge plugin for the Xiaomi Mi Bluetooth Temperature and Humidity Sensor.",
   "license": "Apache-2.0",
   "repository": {
