@@ -203,7 +203,7 @@ export class MijiaThermometerAccessory implements AccessoryPlugin {
     }));
 
     scanner.on("updateHumidity", (newValue => {
-      this.latestTemperature = newValue;
+      this.latestHumidity = newValue;
       this.lastUpdatedAt = Date.now();
 
       this.humidityService.getCharacteristic(this.Characteristic.CurrentRelativeHumidity).updateValue(this.latestHumidity);
