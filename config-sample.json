@@ -10,7 +10,8 @@
     {
       "accessory": "MijiaThermometer",
       "name": "Temperature & Humidity",
-      "address": "85:CB:A8:7F:46:66"
+      "address": "85:CB:A8:7F:46:66",
+      "bindKey": "bhrthjb9mg4980hu80xvosbgzf1toh8p"
     }
   ]
 }
