@@ -41,17 +41,21 @@ Configuration on [Homebridge Config UI X](https://github.com/oznu/homebridge-con
 Alternatively, you could update your Homebridge `config.json` file according to these parameters.
 
 
-| Key                     | Default             |                                                                                             |
-|-------------------------|---------------------|---------------------------------------------------------------------------------------------|
-| `accessory`             | `MijiaThermometer`  | Required. The name of this plugin.                                                          |
-| `name`                  | `Thermometer`       | Required. The name of this accessory. This will appear in your Home app.                    |
-| `address`               | `a0:c1:0c:d4:e1:6b` | Required. The address of the device.                                                        |
-| `humidityName`          | `"Humidity"`        | Optional. Name of the humidity sensor as it will appear in your Home app.                   |
-| `temperatureName`       | `"Temperature"`     | Name of the temperature sensor as it will appear in your Home app.                          |
-| `lowBattery`            | `10`                | At what battery percentage Homekit should start warning about low battery.                  |
-| `temperatureOffset`     | `0`                 | An offset to apply to temperature values for calibration if measured values are incorrect.  |
-| `humidityOffset`        | `0`                 | An offset to apply to humidity values for calibration if measured values are incorrect.     |
-| `bindKey`               |                     | A key which is used to for firmware.                                                        |
+| Key                     | Default                             |                                                                             |
+|-------------------------|-------------------------------------|-----------------------------------------------------------------------------|
+| `accessory`             | `MijiaThermometer`                  | Required. The name of this plugin.                                          |
+| `name`                  | `Thermometer`                       | Required. The name of this accessory. This will appear in your Home app.    |
+| `address`               | `a0:c1:0c:d4:e1:6b`                 | Required. The address of the device.                                        |
+| `bindKey`               | `bhrthjb9mg4980hu80xvosbgzf1toh8p`  | Required. The key to decyrpt BLE data.                                      |
+| `humidityName`          | `"Humidity"`                        | Optional. Name of the humidity sensor as it will appear in your Home app.   |
+| `temperatureName`       | `"Temperature"`                     | Name of the temperature sensor as it will appear in your Home app.          |
+| `lowBattery`            | `10`                                | At what battery percentage Homekit should start warning about low battery.  |
+| `temperatureOffset`     | `0`                                 | An offset to calibrate temperature values if measured incorrectly.          |
+| `humidityOffset`        | `0`                                 | An offset to calibrate humidity values if measured incorrectly.             |
+
+#### Getting BindKey
+
+[post](https://github.com/mKeRix/room-assistant/issues/277).
 
 #### Automatically Retrieved Model, Serial Number and Firmware Revision
 
