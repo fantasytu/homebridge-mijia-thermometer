@@ -22,6 +22,13 @@
         "description": "Required. MAC Address of the device.",
         "required": true
       },
+      "bindKey": {
+        "title": "Bind Key",
+        "type": "string",
+        "default": "",
+        "description": "Required. The key to decyrpt BLE data.",
+        "required": true
+      },
       "temperatureName": {
         "title": "Custom Name - Temperature",
         "type": "string",
@@ -51,12 +58,6 @@
         "type": "integer",
         "default": 0,
         "description": "An offset to apply to humidity values for calibration if measured values are incorrect."
-      },
-      "bindKey": {
-        "title": "Bind Key",
-        "type": "string",
-        "default": "",
-        "description": "Optional. For firmware and adavanced stuff."
       }
     }
   },
@@ -90,8 +91,7 @@
       "items": [
         "lowBattery",
         "temperatureOffset",
-        "humidityOffset",
-        "bindKey"
+        "humidityOffset"
       ]
     }
   ]
