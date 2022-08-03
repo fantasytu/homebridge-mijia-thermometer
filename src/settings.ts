@@ -17,7 +17,7 @@ export const INFO_SERVICE_UUID = '180a';
 // export const BAT_SERVICE_UUID = '180f'
 export const ADVERTISEMENT_SERVICE_UUID = "fe95";
 
-export const CACHE_DIRECTORY = '~/.homebridge/.MijiaThermometer';
+export const CACHE_DIRECTORY = '.MijiaThermometer';
 
 export const CAPABILITIES_FLAGS = {
   connectable: 1 << 0,
