@@ -25,7 +25,7 @@
       "bindKey": {
         "title": "Bind Key",
         "type": "string",
-        "default": "",
+        "format": "string",
         "description": "Required. The key to decyrpt BLE data.",
         "required": true
       },
