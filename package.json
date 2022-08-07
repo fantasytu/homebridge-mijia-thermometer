@@ -1,15 +1,15 @@
 {
   "displayName": "Homebridge Mijia Thermometer",
-  "name": "homebridge-mijia-thermometer-fix",
-  "version": "1.7.5",
+  "name": "homebridge-mijia-thermometer",
+  "version": "1.7.3",
   "description": "Homebridge plugin for the Xiaomi Mi Bluetooth Temperature and Humidity Sensor.",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git://github.com/Arch-Storm/homebridge-mijia-thermometer.git"
+    "url": "git://github.com/fantasytu/homebridge-mijia-thermometer.git"
   },
   "bugs": {
-    "url": "https://github.com/Arch-Storm/homebridge-mijia-thermometer/issues"
+    "url": "https://github.com/fantasytu/homebridge-mijia-thermometer/issues"
   },
   "engines": {
     "node": ">=10.17.0",

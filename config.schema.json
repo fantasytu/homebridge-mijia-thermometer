@@ -26,7 +26,7 @@
         "title": "Bind Key",
         "type": "string",
         "format": "string",
-        "description": "Required. The key to decyrpt BLE data.",
+        "description": "Required. Key for decrypting BLE data. <a href=\"https://github.com/mKeRix/room-assistant/issues/277\" target=\"_blank\">Guide to retrieve</a>",
         "required": true
       },
       "temperatureName": {
