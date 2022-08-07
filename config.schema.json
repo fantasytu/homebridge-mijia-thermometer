@@ -80,6 +80,13 @@
       "type": "flex",
       "flex-flow": "row wrap",
       "items": [
+	"address"
+      ]
+    },
+    {
+      "type": "flex",
+      "flex-flow": "row wrap",
+      "items": [
         "temperatureName",
         "humidityName"
       ]
