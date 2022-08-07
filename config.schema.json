@@ -19,7 +19,7 @@
         "type": "string",
         "format": "string",
         "placeholder": "e.g. 00:00:00:00:00:00",
-        "description": "Required. MAC Address of the device.",
+        "description": "Required. MAC Address of the device. Can be found in MiHome app. (Use traditional style if available -> About)",
         "required": true
       },
       "bindKey": {
