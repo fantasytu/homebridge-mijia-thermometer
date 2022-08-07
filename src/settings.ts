@@ -6,7 +6,7 @@ export const ACCESSORY_NAME = 'MijiaThermometer';
 /**
  * This must match the name of your plugin as defined the package.json
  */
-export const PLUGIN_NAME = 'homebridge-mijia-thermometer';
+export const PLUGIN_NAME = 'homebridge-mijia-thermometer-fix';
 
 /**
  * This is the uuids of services and characteristics that provides data.
